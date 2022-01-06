@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { prepareData, getMainData, getTeamLevelPoints } from './service/LoadService';
+import { prepareData, getMainData, getTeamLevelPoints, getAllData} from './service/DataService';
 import MmbDiff from './MmbDiff'
 
 export default class WithData extends React.Component {
@@ -22,12 +22,16 @@ export default class WithData extends React.Component {
 	}
 
     render() {
+
+
+    	let data = getAllData();
     	console.log('from withData');
     	if (!this.state.loaded)
     		return (<h1>Loading</h1>);
     	else
-    		return (<MmbDiff mainData={ getMainData() } 
-    						 teamLevelPoints={ getTeamLevelPoints() }/>);
+    		return (<MmbDiff teams={ data.teams } 
+    						 points={ data.points }
+    						 title={data.maindata.Raids[0].raid_name}/>);
 
    }
 }
