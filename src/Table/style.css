@@ -23,3 +23,9 @@ table, th, td {
   opacity: 1; /* Показываем подсказку */
   top: 1.5em; /* Положение подсказки */
 }
+.main-row {
+  background-color: lightgreen;
+}
+.selected-row {
+  background-color: lightyellow;
+}

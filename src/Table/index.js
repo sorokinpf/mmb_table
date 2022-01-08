@@ -31,9 +31,19 @@ export default class Table extends React.Component {
 		seconds = seconds - minutes*60;
 		const formatter =  new Intl.NumberFormat('ru-RU',{minimumIntegerDigits:2});
 		let vals = [hours,minutes,seconds].map( (item) => formatter.format(item) );
-		//debugger
 		result += `${vals[0]}:${vals[1]}:${vals[2]}`;
 		return result;
+	}
+
+	onOrderByClick = (e) => {
+		
+		if (this.props.order_by && e.target.id == this.props.order_by.levelpoint_id)
+			this.props.onOrderByChange(null);
+		else{			
+			const new_order_by = this.props.points.filter( 
+									point => point.levelpoint_id == e.target.id)[0];
+			this.props.onOrderByChange(new_order_by);
+		}
 	}
 
 	getTeamPoints(team,selected_points) {
@@ -42,7 +52,6 @@ export default class Table extends React.Component {
 			team.team_points.filter( (item ) => 
 			item.levelpoint_id == x.levelpoint_id)[0]
 		);
-		//debugger;
 		return res.filter(x => !!x)
 		/*let team_points = team.team_points.filter( (item) => 
 						selected_points.map(x=>x.levelpoint_id).
@@ -73,8 +82,22 @@ export default class Table extends React.Component {
 		//Делаем заголовочки
 		
 		let column_names = zip(starts,finishes).map( (item) => {
+			let btn_class = 'btn btn-outline-primary btn-sm';
+			if (this.props.order_by && 
+				this.props.order_by.levelpoint_id == item[1].levelpoint_id)
+				btn_class = 'btn btn-primary btn-sm';
 			return (<td key={'head_col'+item[0].levelpoint_name}>
-						{item[0].levelpoint_name + ' - '}<br/>{item[1].levelpoint_name}
+						<div className="d-flex flex-row align-items-center">
+				          <div className="d-flex flex-column flex-grow-1">
+				          	<span>{item[0].levelpoint_name + ' - '}<br/>{item[1].levelpoint_name}</span>
+				          </div>
+				          <div className="d-flex flex-column ml-1">
+				            <button className={btn_class} id={item[1].levelpoint_id}
+				            		onClick={this.onOrderByClick}>
+				            	<i id={item[1].levelpoint_id} className="fa fa-sort-amount-asc"></i>
+				            </button>
+				          </div>
+				        </div>
 					</td>);
 		});
 
@@ -110,7 +133,6 @@ export default class Table extends React.Component {
 						total_result: item[1].teamlevelpoint_result_seconds}
 			});
 
-			//debugger;
 
 			values = zip(values,values2,values3).map( (item) => Object.assign(item[0],item[1],item[2]));
 
@@ -125,7 +147,6 @@ export default class Table extends React.Component {
 		{
 			let part_results = rows.map( x => {return {part_result: x.values[i] ? x.values[i].part_result : 999999999, id: x.team.team_id}});
 			part_results.sort( (a,b) => a.part_result - b.part_result );
-			//debugger;
 			part_results.map( (item,place) => {
 				
 				let target_row = rows.filter( x => x.team.team_id == item.id)[0];
@@ -135,7 +156,6 @@ export default class Table extends React.Component {
 
 			let total_results = rows.map( x => {return {total_result: x.values[i] ? x.values[i].total_result : 999999999, id: x.team.team_id}});
 			total_results.sort( (a,b) => a.total_result - b.total_result );
-			//debugger;
 			total_results.map( (item,place) => {
 				
 				let target_row = rows.filter( x => x.team.team_id == item.id)[0];
@@ -161,13 +181,16 @@ export default class Table extends React.Component {
 					if(!b.values[order_col])
 						return -33;
 				return a.values[order_col].place - b.values[order_col].place});
-			//debugger;
 		}
 
-		//debugger;
 
 
 		let trs = rows.map( (row) => {
+			let tr_class = '';
+			if (row.team.team_id == this.props.main_team.team_id)
+				tr_class = 'main-row';
+			if (this.props.selected_teams.some( team => team.team_id == row.team.team_id))
+				tr_class = 'selected-row';
 			let values = row.values.map( (item,i) => {
 				let cell_values = {part_result: this.secondsToTime(item.part_result),
 							   lag: this.secondsToTime(item.lag,true),
@@ -204,7 +227,7 @@ export default class Table extends React.Component {
 			})
 
 
-			return (<tr key={'table_row_'+row.team.team_id}>
+			return (<tr key={'table_row_'+row.team.team_id} className={tr_class}>
 						<td key={'table_item_name_'+row.team.team_id}>
 							{row.team.team_name}<br/>
 							{users}

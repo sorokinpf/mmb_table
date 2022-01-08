@@ -104,16 +104,18 @@ export default class CellsOptions extends React.Component {
     		});
     	}
 
-    	return (<div>
-    				<div className="row">
-	    				<div className="offset-5 col-md-2 mmb-checkboxlist">
-							{checkboxes}
+    	return (<div className="offset-3 col-md-6">
+	    			<div className="container border rounded-3">
+	    				<div className="row">
+		    				<div className="offset-3 col-md-6 mmb-checkboxlist">
+								{checkboxes}
+							</div>
 						</div>
+						<div className="offset-2 col-md-8 mmb-checkboxlist">
+						{free}
+						</div>
+						<div><button className="btn btn-primary apply-btn" onClick={this.applyClick}>Применить</button></div>
 					</div>
-					<div className="offset-2 col-md-8 mmb-checkboxlist">
-					{free}
-					</div>
-					<div><button className="btn btn-primary" onClick={this.applyClick}>Применить</button></div>
 				</div>);
 
    }

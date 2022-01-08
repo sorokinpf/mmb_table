@@ -14,7 +14,7 @@ export default class MmbDiff extends React.Component {
 			main_team: null,
 			selected_teams: [],
 			order_by: null
-		}
+		};
 	}
 
 	onCellsChange = (new_cells) => {
@@ -22,10 +22,22 @@ export default class MmbDiff extends React.Component {
 	}
 
 	onPartsChange = (new_parts) => {
-		console.log('onPartsChange');
-		console.log(new_parts);
 		this.setState({selected_points:new_parts, order_by: null});
 	}
+
+	onMainTeamChange = (new_main_team) => {
+		this.setState({main_team: new_main_team});
+	}
+
+	onSelectedTeamsChange = (new_selected_teams) => {
+		this.setState({selected_teams: new_selected_teams});
+	}
+
+	onOrderByChange = new_order_by => {
+		console.log(new_order_by);
+		this.setState({order_by: new_order_by});
+	}
+
 
 	componentDidMount() {
 		if (!this.state.main_team)
@@ -67,14 +79,17 @@ export default class MmbDiff extends React.Component {
     					   main_team={this.state.main_team}    					   
     					   cells={this.state.cells}
     					   onCellsChange={this.onCellsChange}
-    					   onPartsChange={this.onPartsChange}/>
+    					   onPartsChange={this.onPartsChange}
+    					   onMainTeamChange={this.onMainTeamChange}
+    					   onSelectedTeamsChange={this.onSelectedTeamsChange}/>
     				<Table teams={this.props.teams}
     					   points={this.props.points}
     					   selected_points={this.state.selected_points}
     					   selected_teams={this.state.selected_teams}
     					   main_team={this.state.main_team}
     					   order_by={this.state.order_by}
-    					   cells={this.state.cells}/>
+    					   cells={this.state.cells}
+    					   onOrderByChange={this.onOrderByChange}/>
     			</div>);
 
    }

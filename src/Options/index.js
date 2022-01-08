@@ -42,7 +42,9 @@ export default class Options extends React.Component {
     	<div>
     		<TeamsOptions teams={this.props.teams}
     					  main_team={this.props.main_team}
-    					  selected_teams={this.props.selected_teams}/>
+    					  selected_teams={this.props.selected_teams}
+    					  onMainTeamChange={this.props.onMainTeamChange}
+    					  onSelectedTeamsChange={this.props.onSelectedTeamsChange}/>
     	</div> : <div/>;
     	const cells = this.state.showCells ? 
     	<div>
