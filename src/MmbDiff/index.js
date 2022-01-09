@@ -26,7 +26,16 @@ export default class MmbDiff extends React.Component {
 	}
 
 	onMainTeamChange = (new_main_team) => {
+		const check = this.state.selected_teams.some( team => team.team_id == new_main_team.team_id );
+		if (check)
+		{
+			const new_selected_teams = this.state.selected_teams.filter( team =>
+										team.team_id != new_main_team.team_id);
+			this.setState({main_team: new_main_team,
+						   selected_teams: new_selected_teams});	
+		}
 		this.setState({main_team: new_main_team});
+
 	}
 
 	onSelectedTeamsChange = (new_selected_teams) => {
@@ -41,8 +50,8 @@ export default class MmbDiff extends React.Component {
 
 	componentDidMount() {
 		if (!this.state.main_team)
-			this.setState({main_team: this.props.teams[1]});
-			this.setState({selected_teams: [this.props.teams[4]]});
+			this.setState({main_team: this.props.teams[0]});
+			//this.setState({selected_teams: [this.props.teams[4]]});
 		if (!this.state.selected_points)
 		{
 			let selected_points = this.props.points.filter( item => 

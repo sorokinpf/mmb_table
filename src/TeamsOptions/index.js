@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css'
+import TeamsDropdown from '../TeamsDropdown'
 
 export default class TeamsOptions extends React.Component {
 
@@ -27,6 +28,10 @@ export default class TeamsOptions extends React.Component {
 		this.setState({change_main_team: !this.state.change_main_team});
 	}
 
+	onSetMainTeam = (new_main_team) => {
+		this.props.onMainTeamChange(new_main_team);
+	}
+
 	onSelectMainTeam = (e) => {
 		const new_main_team = this.props.teams.filter( 
 						team => team.team_id==this.state.selected_main_team)[0];
@@ -49,6 +54,13 @@ export default class TeamsOptions extends React.Component {
 	onRemoveSelectedTeam = (e) => {
 		let new_selected_teams = this.props.selected_teams
 					.filter( team => team.team_id !== e.target.id);
+
+		this.props.onSelectedTeamsChange(new_selected_teams);
+	}
+
+	onAddSelectedTeam = (new_selected_team) => {
+		let new_selected_teams = this.props.selected_teams;
+		new_selected_teams.push(new_selected_team);
 
 		this.props.onSelectedTeamsChange(new_selected_teams);
 	}
@@ -124,65 +136,40 @@ export default class TeamsOptions extends React.Component {
     		return (<li className="list-group-item" 
     					key={'selected_team_options_'+team.team_id}>
     					{team.team_name}
-    					<i id={team.team_id} 
+    					 <span class="badge bg-light">
+    					 	<i id={team.team_id} 
     						className="fa fa-remove text-danger"
     						onClick={this.onRemoveSelectedTeam}></i>
+    					</span>
+    					
     				</li>
     			)
     	})
 
+    	const teams_for_select = this.props.teams.filter( team => !this.props.selected_teams.map( t => t.team_id)
+										  .includes(team.team_id));
+
+
     	return (<div className="offset-3 col-md-6">
 	    			<div className="container border rounded-3">
-	    				Основная команда: 
-						<button className="btn btn-outline-primary text-nowrap btn-sm" 
-								style={{'marginLeft': "5px", marginTop: '4px', marginBottom: '4px'}}
-								onClick={this.onMainTeamClick}>
-						  {this.state.main_team.team_name}
-						</button>
-						{modal_div}
-	    				{change_main_team}
+	    				<h4>Основная команда</h4>
+	    				<TeamsDropdown text={this.props.main_team.team_name}
+	    							   teams={this.props.teams}									   
+									   id="select_main_team"
+									   onSelected={this.onSetMainTeam}/>
 	    				<hr/>
 	    				<div>
-		    				Выбранные команды:
+		    				<h4>Выбранные команды</h4>
 		    				<ul className="list-group">
 							  {selected_teams_list}
 							</ul>
 						</div>
-
-					    <div className="dropdown">
-						  <button className="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-						    Выбрать еще одну команду для анализа
-						  </button>
-						  <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-						    <div className="container">
-						    	<div className="input-group">
-								    <input  type="text" 
-								    		id="input_main_team" 
-								    		value={this.state.input_main_team} 
-								    		className="form-control" 
-								    		placeholder="Поиск команды" 
-								    		onChange={this.onTextChange}/>
-								    <span className="input-group-text"><i className="fa fa-search"></i></span>
-								    <div className="input-group-append">
-									  <button className="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i className="fa fa-question-circle"></i></button>
-									</div>
-								    
-								    
-
-								</div>
-						    </div>
-						    <li><a className="dropdown-item" href="#">Action</a></li>
-						    <li><a className="dropdown-item" href="#">Another action</a></li>
-						    <li><a className="dropdown-item" href="#">Something else here</a></li>
-						    <li><a className="dropdown-item" href="#">Action</a></li>
-						    <li><a className="dropdown-item" href="#">Another action</a></li>
-						    <li><a className="dropdown-item" href="#">Something else here</a></li>
-						    <li><a className="dropdown-item" href="#">Action</a></li>
-						    <li><a className="dropdown-item" href="#">Another action</a></li>
-						    <li><a className="dropdown-item" href="#">Something else here</a></li>
-						  </ul>
-						</div>
-	    			</div>
+						<TeamsDropdown text="Выбрать еще одну команду для сравнения"
+									   teams={teams_for_select}
+									   id="add_selected_team"
+									   onSelected={this.onAddSelectedTeam}/>
+						<hr/>
+					</div>
 	    		</div>);
 
    }
