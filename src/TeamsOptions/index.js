@@ -150,27 +150,30 @@ export default class TeamsOptions extends React.Component {
 										  .includes(team.team_id));
 
 
-    	return (<div className="offset-3 col-md-6">
-	    			<div className="container border rounded-3">
-	    				<h4>Основная команда</h4>
-	    				<TeamsDropdown text={this.props.main_team.team_name}
-	    							   teams={this.props.teams}									   
-									   id="select_main_team"
-									   onSelected={this.onSetMainTeam}/>
-	    				<hr/>
-	    				<div>
-		    				<h4>Выбранные команды</h4>
-		    				<ul className="list-group">
-							  {selected_teams_list}
-							</ul>
+    	return (<div className="row">
+	    			<div className="col-md-3 col-xs-0"></div>
+	    			<div className="col-md-6 col-xs-12">
+		    			<div className="container border rounded-3">
+		    				<h4>Основная команда</h4>
+		    				<TeamsDropdown text={this.props.main_team.team_name}
+		    							   teams={this.props.teams}									   
+										   id="select_main_team"
+										   onSelected={this.onSetMainTeam}/>
+		    				<hr/>
+		    				<div>
+			    				<h4>Выбранные команды</h4>
+			    				<ul className="list-group">
+								  {selected_teams_list}
+								</ul>
+							</div>
+							<TeamsDropdown text="Выбрать еще одну команду для сравнения"
+										   teams={teams_for_select}
+										   id="add_selected_team"
+										   onSelected={this.onAddSelectedTeam}/>
+							<hr/>
 						</div>
-						<TeamsDropdown text="Выбрать еще одну команду для сравнения"
-									   teams={teams_for_select}
-									   id="add_selected_team"
-									   onSelected={this.onAddSelectedTeam}/>
-						<hr/>
-					</div>
-	    		</div>);
+		    		</div>
+		    	</div>);
 
    }
 }

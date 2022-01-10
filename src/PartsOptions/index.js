@@ -81,7 +81,7 @@ export default class CellsOptions extends React.Component {
     	let checkboxes = all_keys.map( (item) => {
     		return (<div className="form-check mmb-checkbox" key={'cell_option_'+item}>
 						<input className="form-check-input small " type="radio" value="" id={item} checked={this.state.checked==item} onChange={this.radioBoxClicked}/>
-						<label className="form-check-label small" for="flexCheckDefault">
+						<label className="form-check-label small" for="flexCheckDefault" id={item} onClick={this.radioBoxClicked}>
 						{this.text_table[item]}
 						</label>
 					</div>)
@@ -104,17 +104,25 @@ export default class CellsOptions extends React.Component {
     		});
     	}
 
-    	return (<div className="offset-3 col-md-6">
-	    			<div className="container border rounded-3">
-	    				<div className="row">
-		    				<div className="offset-3 col-md-6 mmb-checkboxlist">
-								{checkboxes}
+    	return (<div className="row">
+	    			<div className="col-md-3 col-xs-0"></div>
+	    			<div className="col-md-6 col-xs-12">
+		    			<div className="container border rounded-3">
+		    				<div className="row">
+		    					<div className="col-md-3 col-xs-0"></div>
+
+			    				<div className="col-md-6 col-xs-12 mmb-checkboxlist">
+									{checkboxes}
+								</div>
 							</div>
+							<div className="row">
+								<div className="col-md-2"></div>
+								<div className="col-md-8 col-xs-12 mmb-checkboxlist">
+								{free}
+								</div>
+							</div>
+							<div><button className="btn btn-primary apply-btn" onClick={this.applyClick}>Применить</button></div>
 						</div>
-						<div className="offset-2 col-md-8 mmb-checkboxlist">
-						{free}
-						</div>
-						<div><button className="btn btn-primary apply-btn" onClick={this.applyClick}>Применить</button></div>
 					</div>
 				</div>);
 

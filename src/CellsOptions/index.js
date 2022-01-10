@@ -52,13 +52,17 @@ export default class CellsOptions extends React.Component {
 					</div>)
     	})
     	return (
-    			<div className="offset-3 col-md-6">
-	    			<div className="container border rounded-3">
-	    				<div className="row">
-    						<div className="offset-3 col-md-6">
-		    			
-								{checkboxes}
-								<div><button className="btn btn-primary btn-cells" onClick={this.applyClick}>Применить</button></div>
+	    		<div className="row">
+	    			<div className="col-md-3 col-xs-0"></div>
+	    			<div className="col-md-6 col-xs-12">
+		    			<div className="container border rounded-3">
+		    				<div className="row">
+		    					<div className="col-md-3 col-xs-0"></div>
+	    						<div className="col-md-6 col-xs-12">
+			    			
+									{checkboxes}
+									<div><button className="btn btn-primary btn-cells" onClick={this.applyClick}>Применить</button></div>
+								</div>
 							</div>
 						</div>
 					</div>
