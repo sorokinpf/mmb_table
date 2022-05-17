@@ -10,7 +10,7 @@ export default class MmbDiff extends React.Component {
 		this.state = {
 			inited: false,
 			selected_points: null,
-			cells: ['part_result','lag','coef','summ_lag','place','total_result','total_place'],
+			cells: ['part_result','lag','coef','summ_lag','place','total_result','total_place','path'],
 			main_team: null,
 			selected_teams: [],
 			order_by: null
@@ -64,7 +64,9 @@ export default class MmbDiff extends React.Component {
 			console.log('selected');
 			console.log(selected_points);
 			
-			this.setState({selected_points,order_by:null});
+			//this.setState({selected_points,order_by:null});
+			let default_points = this.props.points.filter( item=>this.props.default_points_names.includes(item.levelpoint_name));
+			this.setState({selected_points: default_points})
 		}
 		//this.setState({selected_teams: [this.props.teams[4]]});
 		this.setState({inited: true});
@@ -72,8 +74,8 @@ export default class MmbDiff extends React.Component {
 	}
 
     render() {
-    	let default_points_names = ['Старт 1 этапа','4','13','22','24','Финиш 1 этапа','Старт 2 этапа','38','Финиш 2 этапа'];
-    	let default_points = this.props.points.filter( item=>default_points_names.includes(item.levelpoint_name));
+    	
+    	let default_points = this.props.points.filter( item=>this.props.default_points_names.includes(item.levelpoint_name));
     	if (!this.state.inited)
     	{
     		return(<h1>Loading</h1>);
@@ -90,7 +92,8 @@ export default class MmbDiff extends React.Component {
     					   onCellsChange={this.onCellsChange}
     					   onPartsChange={this.onPartsChange}
     					   onMainTeamChange={this.onMainTeamChange}
-    					   onSelectedTeamsChange={this.onSelectedTeamsChange}/>
+    					   onSelectedTeamsChange={this.onSelectedTeamsChange}
+    					   choose_parts={this.props.choose_parts}/>
     				<Table teams={this.props.teams}
     					   points={this.props.points}
     					   selected_points={this.state.selected_points}
@@ -98,7 +101,8 @@ export default class MmbDiff extends React.Component {
     					   main_team={this.state.main_team}
     					   order_by={this.state.order_by}
     					   cells={this.state.cells}
-    					   onOrderByChange={this.onOrderByChange}/>
+    					   onOrderByChange={this.onOrderByChange}
+    					   choose_parts={this.props.choose_parts}/>
     			</div>);
 
    }

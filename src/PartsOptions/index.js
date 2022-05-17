@@ -89,7 +89,12 @@ export default class CellsOptions extends React.Component {
     	let free = null;
     	if (this.state.checked=='free')
     	{	
+    		//Найдем внутренние точки выбора (без краев) и соеденим в массив.
+    		const inner_choose = this.props.choose_parts.map( part => part.slice(1,-1)).reduce( (prev,item) => prev.concat(item),[]);
     		free = this.props.points.map( item => {
+    			if(inner_choose.includes(item.levelpoint_name))	{
+    					return null;
+    			}
     			return (<div className="form-check form-check-inline"><input key={'parts_options_'+item.levelpoint_id} 
     					className="form-check-input small" 
     					type="checkbox" 

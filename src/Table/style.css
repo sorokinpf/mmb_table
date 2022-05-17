@@ -29,3 +29,23 @@ table, th, td {
 .selected-row {
   background-color: lightyellow;
 }
+table {
+  table-layout: auto;
+}
+.team-col {
+  min-width: 200px;
+  max-width: 200px;
+  word-wrap: break-word;
+  vertical-align:middle;
+}
+.result-col {
+  min-width: 135px;
+  max-width: 145px;
+  vertical-align:middle;
+}
+.value-col {
+  min-width: 130px;
+  max-width: 140px;
+  word-wrap: break-word;
+  /*word-break: break-all;*/
+}

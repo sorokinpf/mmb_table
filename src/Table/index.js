@@ -17,6 +17,8 @@ export default class Table extends React.Component {
 	}
 
 	secondsToTime(seconds,diff=false) {
+		if(seconds==='-')
+			return '-';
 		let result = diff ? '+' : '';
 		if(seconds<0){
 			result = '-';
@@ -52,7 +54,7 @@ export default class Table extends React.Component {
 			team.team_points.filter( (item ) => 
 			item.levelpoint_id == x.levelpoint_id)[0]
 		);
-		return res.filter(x => !!x)
+		return res; // res.filter(x => !!x)
 		/*let team_points = team.team_points.filter( (item) => 
 						selected_points.map(x=>x.levelpoint_id).
 							includes(item.levelpoint_id) );
@@ -61,8 +63,12 @@ export default class Table extends React.Component {
 
 	getTeamResults(team,selected_points) {
 		let team_points = this.getTeamPoints(team,selected_points);
-		return zip(team_points.slice(0,-1),team_points.slice(1,)).map( (item) => 
-			item[1].teamlevelpoint_result_seconds - item[0].teamlevelpoint_result_seconds
+		return zip(team_points.slice(0,-1),team_points.slice(1,)).map( (item) => {
+			if(!item[0] || !item[1]){
+				return null;
+			}
+			return item[1].teamlevelpoint_result_seconds - item[0].teamlevelpoint_result_seconds;
+		}
 		);
 
 
@@ -86,25 +92,25 @@ export default class Table extends React.Component {
 			if (this.props.order_by && 
 				this.props.order_by.levelpoint_id == item[1].levelpoint_id)
 				btn_class = 'btn btn-primary btn-sm';
-			return (<td key={'head_col'+item[0].levelpoint_name}>
-						<div className="d-flex flex-row align-items-center">
+			return (<td className="value-col" key={'head_col'+item[0].levelpoint_name}>
+						
 				          <div className="d-flex flex-column flex-grow-1">
 				          	<span>{item[0].levelpoint_name + ' - '}<br/>{item[1].levelpoint_name}</span>
 				          </div>
-				          <div className="d-flex flex-column ml-1">
+				          <div className="">
 				            <button className={btn_class} id={item[1].levelpoint_id}
 				            		onClick={this.onOrderByClick}>
 				            	<i id={item[1].levelpoint_id} className="fa fa-sort-amount-asc"></i>
 				            </button>
 				          </div>
-				        </div>
+				        
 					</td>);
 		});
 
 		let header = (<tr>
-						<td key={'head_col_team_name'}>Команда</td>
+						<td className="team-col" key={'head_col_team_name'}>Команда</td>
 						{column_names}
-						<td key={'head_col_summary'}>Итого</td>
+						<td className="result-col" key={'head_col_summary'}>Итого</td>
 					 </tr>);
 
 		let teams = [main_team,...selected_teams,...other_teams];
@@ -119,48 +125,64 @@ export default class Table extends React.Component {
 
 			//Считаем отставание и коэфициент на участке
 			let values = zip(team_results,main_team_results).map( (item) => {
-				return {lag: item[1]-item[0], coef: item[0]==0 ? '-' : item[1]/item[0]}				
+				return {lag: (item[1]!=null && item[0]!=null) ? item[1]-item[0] : '-', coef: (item[1] && item[0] && item[0]!=0) ? item[1]/item[0] : '-'}				
 			});
 
 			//Считаем суммарное отставание после участка
 			let values2 = zip(team_points.slice(1),main_team_points.slice(1)).map( (item) => {
-				return {summ_lag: item[1].teamlevelpoint_result_seconds - item[0].teamlevelpoint_result_seconds}
+				return {summ_lag: (item[1]!==null && item[0]!=null) ? item[1].teamlevelpoint_result_seconds - item[0].teamlevelpoint_result_seconds : '-'}
 			});
 
 			//Добавим время прохождения участка
 			let values3 = zip(team_points.slice(0,-1), team_points.slice(1)).map( (item) => {
-				return {part_result: item[1].teamlevelpoint_result_seconds - item[0].teamlevelpoint_result_seconds,
-						total_result: item[1].teamlevelpoint_result_seconds}
+				return {part_result: (item[1]!=null && item[0]!=null) ? item[1].teamlevelpoint_result_seconds - item[0].teamlevelpoint_result_seconds : '-',
+						total_result: item[1]!=null ? item[1].teamlevelpoint_result_seconds : '-'}
+			});
+
+			//Найдем участки выбора и если они есть, добавим путь на участке
+			let choose_st_f = this.props.choose_parts.map( part => [part[0],part[part.length-1]]);
+			let values4 = zip(this.props.selected_points.slice(0,-1),this.props.selected_points.slice(1)).map( ([point1,point2]) => {
+					//debugger;
+					const choosen_part = choose_st_f.filter( ([c1,c2]) => (point1.levelpoint_name == c1) && (point2.levelpoint_name == c2));
+					if (!choosen_part.length) {
+						return {path: null};
+					}
+					return {path: team.choose_parts.filter( part=> part.key == choosen_part[0].join('-'))[0].path};
 			});
 
 
-			values = zip(values,values2,values3).map( (item) => Object.assign(item[0],item[1],item[2]));
+			values = zip(values,values2,values3,values4).map( (item) => Object.assign(item[0],item[1],item[2],item[3]));
 
-			return {values,team,coef: main_team.team_result_seconds/team.team_result_seconds, 
+			return {values,team,coef: team.team_result_seconds!=0 ? main_team.team_result_seconds/team.team_result_seconds : '-', 
 					total_lag: main_team.team_result_seconds-team.team_result_seconds};
 
 
 		} );
 
 		//Добавим места по участкам
+		const bad_value = 999999999;
 		for (let i=0;i<this.props.selected_points.length-1;i++)
 		{
-			let part_results = rows.map( x => {return {part_result: x.values[i] ? x.values[i].part_result : 999999999, id: x.team.team_id}});
+			let part_results = rows.map( x => {return {part_result: x.values[i] ? x.values[i].part_result : bad_value, id: x.team.team_id}});
 			part_results.sort( (a,b) => a.part_result - b.part_result );
 			part_results.map( (item,place) => {
 				
 				let target_row = rows.filter( x => x.team.team_id == item.id)[0];
-				if (target_row.values[i])
+				if (target_row.values[i] && target_row.values[i].part_result != '-')
 					target_row.values[i]['place']=place+1;
+				else
+					target_row.values[i]['place']='-'
 			});
 
-			let total_results = rows.map( x => {return {total_result: x.values[i] ? x.values[i].total_result : 999999999, id: x.team.team_id}});
+			let total_results = rows.map( x => {return {total_result: x.values[i] ? x.values[i].total_result : bad_value, id: x.team.team_id}});
 			total_results.sort( (a,b) => a.total_result - b.total_result );
 			total_results.map( (item,place) => {
-				
+
 				let target_row = rows.filter( x => x.team.team_id == item.id)[0];
-				if (target_row.values[i])
+				if (target_row.values[i] && target_row.values[i].total_result != '-')
 					target_row.values[i]['total_place']=place+1;
+				else
+					target_row.values[i]['total_place']='-'
 			});
 		}
 		
@@ -192,13 +214,15 @@ export default class Table extends React.Component {
 			if (this.props.selected_teams.some( team => team.team_id == row.team.team_id))
 				tr_class = 'selected-row';
 			let values = row.values.map( (item,i) => {
+				//debugger;
 				let cell_values = {part_result: this.secondsToTime(item.part_result),
 							   lag: this.secondsToTime(item.lag,true),
 							   coef: item.coef=='-'? item.coef : item.coef.toFixed(3),
 							   summ_lag: this.secondsToTime(item.summ_lag,true), 
 							   place: item.place,
 							   total_result: this.secondsToTime(item.total_result),
-							   total_place: item.total_place
+							   total_place: item.total_place,
+							   path: <div className='path-div'>{item.path}</div>
 							};
 
 				let cells = this.props.cells.map( (item) => {
@@ -208,7 +232,7 @@ export default class Table extends React.Component {
 						   </div>);
 				});				
 				
-				return (<td key={'table_item_'+row.team.team_id+i}>
+				return (<td className="value-col" key={'table_item_'+row.team.team_id+i}>
 							{cells}				
 						</td>
 					);
@@ -226,18 +250,25 @@ export default class Table extends React.Component {
 						</small><br/></div>)
 			})
 
+			let res = row.team.team_result;
+			let lag = this.secondsToTime(row.total_lag);
+			let coef = row.coef.toFixed(3);
+			if(!res){
+				res = lag = coef = '-';
+			}
+
 
 			return (<tr key={'table_row_'+row.team.team_id} className={tr_class}>
-						<td key={'table_item_name_'+row.team.team_id}>
+						<td className="team-col" key={'table_item_name_'+row.team.team_id}>
 							{row.team.team_name}<br/>
 							{users}
 						</td>
 						{values}
-						<td key={'table_item_summary_'+row.team.team_id}>
+						<td className="result-col" key={'table_item_summary_'+row.team.team_id}>
 						Место: { place }<br/>
-						Результат: {row.team.team_result}<br/>
-						Отставание: {this.secondsToTime(row.total_lag)}<br/>
-						Коэффициент: {row.coef.toFixed(3)}
+						Рез-т: { res }<br/>
+						Отс-е: { lag }<br/>
+						Коэфф: { coef }
 						</td>
 
 					</tr>
@@ -256,8 +287,8 @@ export default class Table extends React.Component {
 
 		
     	return (<div>
-    				<table>
-    					<thead>
+    				<table className="table">
+    					<thead className="thead-dark">
     						{header}
     					</thead>
     					<tbody>

@@ -25,10 +25,16 @@ const parseData = () =>
 
 	}
 
+	let points = maindata['Levels'];
+
+	points.map( (item) => item.levelpoint_order = parseInt(item.levelpoint_order));
+	points.sort( (a,b) => a.levelpoint_order - b.levelpoint_order);
+
 	//Пересчитаем время взятия в секунды, а также общее время тоже переведем в секунды
 	points_details.map( (point) => {
 		point.teamlevelpoint_durationdecimal = parseFloat(point.teamlevelpoint_durationdecimal)*60.;
 		point.teamlevelpoint_result_seconds = timeToSeconds(point.teamlevelpoint_result);
+		point.levelpoint_name = points.filter(p => point.levelpoint_id == p.levelpoint_id)[0].levelpoint_name;
 		});
 
 	//Посчитаем время в секундах
@@ -51,6 +57,7 @@ const parseData = () =>
 	//Добавим в каждую команду её КПшки
 	teams.forEach( (item,i,arr) => { 
 		var team_points = points_details.filter( point => point.team_id === item.team_id );
+		team_points.sort( (a,b) => a.teamlevelpoint_result_seconds - b.teamlevelpoint_result_seconds);
 		item['team_points'] = team_points;
 	})
 
@@ -62,10 +69,7 @@ const parseData = () =>
 	})
 
 
-	let points = maindata['Levels'];
-
-	points.map( (item) => item.levelpoint_order = parseInt(item.levelpoint_order));
-	points.sort( (a,b) => a.levelpoint_order - b.levelpoint_order);
+	
 
 	all_data['teams'] = teams;
 	all_data['points_details'] = points_details;
@@ -90,8 +94,22 @@ const prepareData = (onPrepare) => {
 }
 
 const getAllData = () => { return all_data };
-const getMainData = () => { return all_data.maindata };
-const getTeamLevelPoints = () => {return all_data.TeamLevelPoints };
+
+const analyzeChooseParts = (choose_parts) => {
+	all_data.teams.map ( team => {
+		team['choose_parts'] = []
+		choose_parts.map( part => {
+			const key = part[0]+'-'+part.slice(-1)[0];
+			const part_points = team.team_points.filter( point => part.includes(point.levelpoint_name));
+			const team_points_names = team.team_points.map(point => point.levelpoint_name);
+			const absent_points = part.filter( point_name => !team_points_names.includes(point_name));
+			let path = part_points.map( point => point.levelpoint_name).join('-');
+			if(absent_points.length)
+				path+=` (${absent_points.join(',')})`
+			team.choose_parts.push( {key,part_points,path} );
+		})
+	})
+}
 
 
-export { prepareData, getMainData, getTeamLevelPoints, getAllData } ;
+export { prepareData, getAllData, analyzeChooseParts } ;

@@ -36,7 +36,8 @@ export default class Options extends React.Component {
     		<PartsOptions points={this.props.points} 
     				      selected_points={this.props.selected_points} 
     				      default_points={this.props.default_points}
-    				      onPartsChange={this.props.onPartsChange}/>
+    				      onPartsChange={this.props.onPartsChange}
+                          choose_parts={this.props.choose_parts}/>
     	</div> : <div/>;
     	const teams = this.state.showTeams ? 
     	<div>
