@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {zip,cell_table} from '../utils';
+import { saveTableData } from '../service/DataService';
 import './style.css';
 
 export default class Table extends React.Component {
@@ -275,6 +276,47 @@ export default class Table extends React.Component {
 
 				)
 		})
+
+		let trs_for_download = rows.map( (row) => {
+			let users = row.team.users.map( (item) => {
+				return (item.user_name)
+			})
+			let place = row.team.place;
+			if (row.team.team_minlevelpointorderwitherror)
+				place = '-';
+			if (!row.team.team_result)
+				place = '-';
+
+			let res = row.team.team_result;
+			let lag = this.secondsToTime(row.total_lag);
+			let coef = row.coef.toFixed(3);
+			if(!res){
+				res = lag = coef = '-';
+			}
+			return {team_name:row.team.team_name,
+				team_runners:users,
+				place,
+				res,
+				lag,
+				coef,
+				values:row.values
+				
+			};
+		});
+
+		let column_names_for_save = zip(starts,finishes).map( (item) => {
+			return item[0].levelpoint_name + ' - '+ item[1].levelpoint_name;			
+		});
+
+		let to_save = {
+			headers: column_names_for_save,
+			table_data: trs_for_download
+		};
+
+		saveTableData(to_save);
+
+		//debugger;
+
 
 
 

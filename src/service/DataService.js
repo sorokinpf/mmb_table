@@ -13,6 +13,8 @@ var all_data = { maindata : null, TeamLevelPoints: null, wpt: '',
 
 var globalOnPrepare = null;
 
+var table_saved_data = null;
+
 const parseData = () => 
 {
 	var maindata = all_data.maindata;
@@ -111,5 +113,8 @@ const analyzeChooseParts = (choose_parts) => {
 	})
 }
 
+const saveTableData = (table_data) => { table_saved_data = table_data };
 
-export { prepareData, getAllData, analyzeChooseParts } ;
+const getSavedData = () => { return table_saved_data };
+
+export { prepareData, getAllData, analyzeChooseParts, saveTableData, getSavedData } ;

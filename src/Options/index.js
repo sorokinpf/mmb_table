@@ -4,6 +4,7 @@ import CellsOptions from '../CellsOptions'
 import PartsOptions from '../PartsOptions'
 import TeamsOptions from '../TeamsOptions'
 import './style.css'
+import { getSavedData } from '../service/DataService';
 
 export default class Options extends React.Component {
 
@@ -25,7 +26,31 @@ export default class Options extends React.Component {
 		//prepareData(this.onLoad);
 	}
 
+	onDownload = () => {
+		console.log("onDownload");
+		//debugger;
+		function download(filename, text) {
+	  var element = document.createElement('a');
+	  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+	  element.setAttribute('download', filename);
+
+	  element.style.display = 'none';
+	  document.body.appendChild(element);
+
+	  element.click();
+
+	  document.body.removeChild(element);
+		}
+		download('mmb_table.json',JSON.stringify(getSavedData()));
+
+	}
+
 	onClick= (e) => {
+		if(e.target.id==='exportButton')
+		{
+			this.onDownload();
+			return;
+		}
 		this.setState({[e.target.id]: !this.state[e.target.id]})
 	}
 
@@ -56,11 +81,13 @@ export default class Options extends React.Component {
 		const partsOptions = <div><div className="btn-group option-button"><a className="btn btn-outline-primary btn-sm dropdown-toggle" href="#" role="button" id="showParts" aria-expanded="false" onClick={this.onClick}>{this.names.parts}</a></div> {parts}</div>
     	const teamsOptions = <div><div className="btn-group option-button"><a className="btn btn-outline-primary btn-sm dropdown-toggle" href="#" role="button" id="showTeams" aria-expanded="false" onClick={this.onClick}>{this.names.teams}</a></div> {teams}</div>
     	const cellsOptions = <div><div className="btn-group option-button"><a className="btn btn-outline-primary btn-sm dropdown-toggle" href="#" role="button" id="showCells" aria-expanded="false" onClick={this.onClick}>{this.names.cells}</a></div> {cells}</div>
+    	const exportButton = <div><div className="btn-group option-button"><a className="btn btn-outline-primary btn-sm btn-xs" href="#" role="button" id="exportButton" aria-expanded="false" onClick={this.onClick}>Export JSON</a></div></div>
     	
     	return (<div>
     				<div>{partsOptions}</div>
     				<div>{teamsOptions}</div>
     				<div>{cellsOptions}</div>
+    				<div>{exportButton}</div>
     			</div>);
 
    }
