@@ -1,6 +1,6 @@
 
 const loadFile = (filename, param_name) => {
-	return fetch('/' + filename)
+	return fetch('/' + filename + '?' + (new Date().getTime()))
 		.then( (res) => { res.json().then( (body) => {
 
 				save(body,param_name);
